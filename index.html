@@ -3,39 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REAL | KI PROJEKT</title>
+    <title>REAL | Showreel</title>
     <style>
-        body { background: white; color: black; margin: 0; font-family: 'Arial Black', sans-serif; display: flex; flex-direction: column; align-items: center; }
+        body { margin: 0; background: #fff; color: #000; font-family: 'Arial Black', sans-serif; display: flex; flex-direction: column; align-items: center; }
         
-        /* Blocksatz Header */
-        header { padding: 60px 20px; width: fit-content; }
-        .title-wrapper { display: flex; flex-direction: column; width: 100%; }
-        h1 { font-size: clamp(80px, 20vw, 250px); margin: 0; line-height: 0.8; letter-spacing: -0.05em; }
+        /* Blocksatz Header: Schmiegt sich an REAL an */
+        header { padding: 80px 20px 40px; display: flex; justify-content: center; width: 100%; box-sizing: border-box; }
+        .title-wrapper { display: flex; flex-direction: column; width: fit-content; }
+        
+        h1 { 
+            font-size: clamp(80px, 20vw, 250px); 
+            margin: 0; 
+            line-height: 0.8; 
+            letter-spacing: -0.05em; 
+            text-transform: uppercase;
+        }
         
         .sub { 
             display: flex; 
             justify-content: space-between; 
-            font-family: Arial; 
-            font-weight: bold; 
-            font-size: clamp(10px, 1.5vw, 20px);
-            margin-top: 10px;
+            font-family: Arial, sans-serif; 
+            font-weight: 900; 
+            font-size: clamp(10px, 1.6vw, 22px); 
+            margin-top: 5px; 
+            width: 100%;
         }
 
-        /* Galerie */
+        /* Galerie-Gitter */
         .gallery { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
-            gap: 10px; 
-            max-width: 800px; 
+            gap: 15px; 
+            max-width: 900px; 
             width: 90%; 
+            padding-bottom: 100px; 
         }
-        .item { aspect-ratio: 1/1; overflow: hidden; background: #eee; cursor: pointer; }
-        .item img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: 0.3s; }
-        .item:hover img { filter: grayscale(0%); transform: scale(1.05); }
+        
+        @media (max-width: 600px) { .gallery { grid-template-columns: repeat(2, 1fr); } }
+
+        .item { aspect-ratio: 1/1; background: #f0f0f0; cursor: pointer; overflow: hidden; }
+        .item img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: 0.4s; }
+        .item:hover img { filter: grayscale(0%); transform: scale(1.03); }
 
         /* Lightbox */
-        #lb { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; justify-content:center; align-items:center; z-index:99; }
-        #lb img { max-width: 90%; max-height: 90%; filter: grayscale(100%); }
+        #lb { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 1000; cursor: pointer; }
+        #lb img { max-width: 90%; max-height: 90%; object-fit: contain; }
     </style>
 </head>
 <body>
@@ -51,34 +63,39 @@
 
 <div class="gallery" id="g"></div>
 
-<div id="lb" onclick="this.style.display='none'"><img id="lb-img"></div>
+<div id="lb" onclick="this.style.display='none'"><img id="im"></div>
 
 <script>
-    const G = document.getElementById('g');
-    const LB = document.getElementById('lb');
-    const LBI = document.getElementById('lb-img');
+    const g = document.getElementById('g');
+    const lb = document.getElementById('lb'), im = document.getElementById('im');
     
-    // Wir generieren die Bilder 1-51
-    let imgs = Array.from({length: 51}, (_, i) => `bilder/${i + 1}.jpg`);
+    // Generiert Pfade für 51 Bilder
+    let images = Array.from({length: 51}, (_, i) => `bilder/${i + 1}.jpg`);
     
     // Mischen
-    imgs.sort(() => Math.random() - 0.5);
+    images.sort(() => Math.random() - 0.5);
 
-    imgs.forEach(src => {
+    images.forEach(src => {
         const div = document.createElement('div');
         div.className = 'item';
         const img = document.createElement('img');
         img.src = src;
-        // Fallback für .JPG (groß)
-        img.onerror = () => { if(!img.src.includes('.JPG')) img.src = src.replace('.jpg', '.JPG'); };
+        img.loading = "lazy";
         
-        img.onclick = () => {
-            LBI.src = img.src;
-            LB.style.display = 'flex';
+        // Automatischer Check: Falls .jpg nicht geht, probiere .JPG
+        img.onerror = () => { 
+            if (img.src.includes('.jpg')) {
+                img.src = src.replace('.jpg', '.JPG'); 
+            } else {
+                div.style.display = 'none'; // Verstecke das Feld, wenn Bild gar nicht existiert
+            }
         };
+        
+        img.onclick = () => { im.src = img.src; lb.style.display = 'flex'; };
         div.appendChild(img);
-        G.appendChild(div);
+        g.appendChild(div);
     });
 </script>
+
 </body>
 </html>
