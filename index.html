@@ -3,130 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REAL | Dietmar Zechner</title>
+    <title>REAL | KI PROJEKT</title>
     <style>
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #000000;
+        body { background: white; color: black; margin: 0; font-family: 'Arial Black', sans-serif; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Blocksatz Header */
+        header { padding: 60px 20px; width: fit-content; }
+        .title-wrapper { display: flex; flex-direction: column; width: 100%; }
+        h1 { font-size: clamp(80px, 20vw, 250px); margin: 0; line-height: 0.8; letter-spacing: -0.05em; }
+        
+        .sub { 
+            display: flex; 
+            justify-content: space-between; 
+            font-family: Arial; 
+            font-weight: bold; 
+            font-size: clamp(10px, 1.5vw, 20px);
+            margin-top: 10px;
         }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: 'Arial Black', Gadget, sans-serif;
-            overflow-x: hidden;
+        /* Galerie */
+        .gallery { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            max-width: 800px; 
+            width: 90%; 
         }
+        .item { aspect-ratio: 1/1; overflow: hidden; background: #eee; cursor: pointer; }
+        .item img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: 0.3s; }
+        .item:hover img { filter: grayscale(0%); transform: scale(1.05); }
 
-        /* --- HEADER: Blocksatz-Trick --- */
-        header {
-            width: 100%;
-            padding: 80px 20px 40px;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: center; /* Zentriert den Block auf der Seite */
-        }
-
-        /* Dieser Container schmiegt sich EXAKT an das Wort REAL an */
-        .title-wrapper {
-            display: flex;
-            flex-direction: column;
-            width: fit-content; 
-        }
-
-        h1 {
-            font-size: clamp(80px, 22vw, 240px);
-            line-height: 0.75;
-            margin: 0;
-            letter-spacing: -0.05em; /* Zieht REAL massiv zusammen */
-            text-transform: uppercase;
-            font-weight: 900;
-        }
-
-        .subtitle-block {
-            display: flex;
-            justify-content: space-between; /* Verteilt Wörter exakt vom R bis zum L */
-            width: 100%;
-            margin-top: 15px;
-            font-family: Arial, sans-serif;
-            font-weight: bold;
-            font-size: clamp(10px, 1.8vw, 19px);
-            letter-spacing: 0;
-            text-transform: uppercase;
-        }
-
-        /* --- GALERIE --- */
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            max-width: 800px;
-            width: 92%;
-            padding-bottom: 100px;
-        }
-
-        @media (max-width: 600px) {
-            .gallery { 
-                grid-template-columns: repeat(2, 1fr); 
-                gap: 8px;
-            }
-            header { padding-top: 50px; }
-        }
-
-        .img-wrapper {
-            aspect-ratio: 1 / 1;
-            overflow: hidden;
-            background: #fcfcfc;
-            cursor: pointer;
-            border: 1px solid #eee; /* Ganz zarter Rahmen für weiße Bilder */
-        }
-
-        .img-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: grayscale(100%);
-            transition: transform 0.5s ease, filter 0.5s ease;
-        }
-
-        .img-wrapper:hover img {
-            transform: scale(1.05);
-            filter: grayscale(0%);
-        }
-
-        /* --- LIGHTBOX --- */
-        #lightbox {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            cursor: pointer;
-        }
-
-        #lightbox img {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-            filter: grayscale(100%);
-            transition: opacity 0.3s ease;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: white;
-            font-size: 40px;
-            font-family: Arial, sans-serif;
-            line-height: 1;
-        }
+        /* Lightbox */
+        #lb { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:none; justify-content:center; align-items:center; z-index:99; }
+        #lb img { max-width: 90%; max-height: 90%; filter: grayscale(100%); }
     </style>
 </head>
 <body>
@@ -134,107 +43,42 @@
 <header>
     <div class="title-wrapper">
         <h1>REAL</h1>
-        <div class="subtitle-block">
-            <span>SHOWREEL</span>
-            <span>VON</span>
-            <span>DIETMAR</span>
-            <span>ZECHNER</span>
+        <div class="sub">
+            <span>SHOWREEL</span><span>VON</span><span>DIETMAR</span><span>ZECHNER</span>
         </div>
     </div>
 </header>
 
-<div class="gallery" id="gallery"></div>
+<div class="gallery" id="g"></div>
 
-<div id="lightbox" onclick="closeLightbox()">
-    <span class="close-btn">&times;</span>
-    <img id="lightbox-img" src="">
-</div>
+<div id="lb" onclick="this.style.display='none'"><img id="lb-img"></div>
 
 <script>
-    const imageCount = 51;
-    const galleryContainer = document.getElementById('gallery');
+    const G = document.getElementById('g');
+    const LB = document.getElementById('lb');
+    const LBI = document.getElementById('lb-img');
     
-    // 1. Array mit Zahlen 1 bis 51 erstellen und mischen
-    let numbers = Array.from({length: imageCount}, (_, i) => i + 1);
-    numbers.sort(() => Math.random() - 0.5);
+    // Wir generieren die Bilder 1-51
+    let imgs = Array.from({length: 51}, (_, i) => `bilder/${i + 1}.jpg`);
+    
+    // Mischen
+    imgs.sort(() => Math.random() - 0.5);
 
-    // Hier speichern wir die funktionierenden Links für die Lightbox
-    let shuffledImages = new Array(imageCount);
-
-    numbers.forEach((num, index) => {
+    imgs.forEach(src => {
         const div = document.createElement('div');
-        div.className = 'img-wrapper';
+        div.className = 'item';
         const img = document.createElement('img');
-        img.loading = "lazy";
+        img.src = src;
+        // Fallback für .JPG (groß)
+        img.onerror = () => { if(!img.src.includes('.JPG')) img.src = src.replace('.jpg', '.JPG'); };
         
-        // MAGISCHER FALLBACK: Löst die häufigsten GitHub-Probleme
-        const extensions = ['jpg', 'JPG', 'jpeg', 'JPEG'];
-        let tryIndex = 0;
-
-        const tryLoadImage = () => {
-            if (tryIndex < extensions.length) {
-                img.src = `bilder/${num}.${extensions[tryIndex]}`;
-                tryIndex++;
-            } else {
-                // Wenn kein Bild gefunden wird, verstecke das leere Quadrat
-                div.style.display = 'none';
-            }
+        img.onclick = () => {
+            LBI.src = img.src;
+            LB.style.display = 'flex';
         };
-
-        // Wenn Fehler (z.B. 404), probiere die nächste Endung
-        img.onerror = tryLoadImage; 
-        
-        // Wenn das Bild erfolgreich lädt, in die Lightbox-Liste aufnehmen
-        img.onload = () => {
-            shuffledImages[index] = img.src;
-            img.onclick = (e) => openLightbox(index, e);
-        };
-
-        // Ersten Versuch starten
-        tryLoadImage();
-
         div.appendChild(img);
-        galleryContainer.appendChild(div);
+        G.appendChild(div);
     });
-
-    // --- Lightbox Logik ---
-    let currentIndex = 0;
-    const lb = document.getElementById('lightbox');
-    const lbImg = document.getElementById('lightbox-img');
-
-    function openLightbox(index, event) {
-        event.stopPropagation();
-        currentIndex = index;
-        updateLightboxImage();
-        lb.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeLightbox() {
-        lb.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-
-    function updateLightboxImage() {
-        lbImg.style.opacity = 0;
-        setTimeout(() => {
-            // Überspringe leere Plätze (falls ein Bild ganz fehlt)
-            while(!shuffledImages[currentIndex]) {
-                currentIndex = (currentIndex + 1) % imageCount;
-            }
-            lbImg.src = shuffledImages[currentIndex];
-            lbImg.style.opacity = 1;
-        }, 150);
-    }
-
-    lbImg.onclick = (event) => {
-        event.stopPropagation();
-        currentIndex = (currentIndex + 1) % imageCount;
-        updateLightboxImage();
-    };
-
-    window.onkeydown = (e) => { if (e.key === "Escape") closeLightbox(); };
 </script>
-
 </body>
 </html>
