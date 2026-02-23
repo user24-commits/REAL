@@ -22,41 +22,44 @@
             overflow-x: hidden;
         }
 
-        /* HEADER: REAL & Subtext bündig */
+        /* --- HEADER: Blocksatz-Trick --- */
         header {
             width: 100%;
-            max-width: 800px;
             padding: 80px 20px 40px;
             box-sizing: border-box;
             display: flex;
+            justify-content: center; /* Zentriert den Block auf der Seite */
+        }
+
+        /* Dieser Container schmiegt sich EXAKT an das Wort REAL an */
+        .title-wrapper {
+            display: flex;
             flex-direction: column;
-            align-items: center;
+            width: fit-content; 
         }
 
         h1 {
             font-size: clamp(80px, 22vw, 240px);
             line-height: 0.75;
             margin: 0;
-            text-align: center;
-            width: 100%;
-            letter-spacing: -0.05em;
+            letter-spacing: -0.05em; /* Zieht REAL massiv zusammen */
             text-transform: uppercase;
             font-weight: 900;
         }
 
         .subtitle-block {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Verteilt Wörter exakt vom R bis zum L */
             width: 100%;
-            margin-top: 10px;
+            margin-top: 15px;
             font-family: Arial, sans-serif;
             font-weight: bold;
-            font-size: clamp(10px, 1.8vw, 20px);
-            letter-spacing: 0.02em;
+            font-size: clamp(10px, 1.8vw, 19px);
+            letter-spacing: 0;
             text-transform: uppercase;
         }
 
-        /* GALERIE: 3 Spalten Desktop, 2 Spalten Handy */
+        /* --- GALERIE --- */
         .gallery {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -77,9 +80,9 @@
         .img-wrapper {
             aspect-ratio: 1 / 1;
             overflow: hidden;
-            background: #f9f9f9;
+            background: #fcfcfc;
             cursor: pointer;
-            border: 1px solid #eee;
+            border: 1px solid #eee; /* Ganz zarter Rahmen für weiße Bilder */
         }
 
         .img-wrapper img {
@@ -95,7 +98,7 @@
             filter: grayscale(0%);
         }
 
-        /* LIGHTBOX */
+        /* --- LIGHTBOX --- */
         #lightbox {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -121,7 +124,7 @@
             right: 30px;
             color: white;
             font-size: 40px;
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             line-height: 1;
         }
     </style>
@@ -129,12 +132,14 @@
 <body>
 
 <header>
-    <h1>REAL</h1>
-    <div class="subtitle-block">
-        <span>SHOWREEL</span>
-        <span>VON</span>
-        <span>DIETMAR</span>
-        <span>ZECHNER</span>
+    <div class="title-wrapper">
+        <h1>REAL</h1>
+        <div class="subtitle-block">
+            <span>SHOWREEL</span>
+            <span>VON</span>
+            <span>DIETMAR</span>
+            <span>ZECHNER</span>
+        </div>
     </div>
 </header>
 
@@ -146,32 +151,53 @@
 </div>
 
 <script>
-    // Konfiguration für deine 51 neuen Bilder
     const imageCount = 51;
-    const images = [];
-    
-    // WICHTIG: Hier prüfen ob .jpg oder .JPG
-    for(let i = 1; i <= imageCount; i++) {
-        images.push(`bilder/${i}.jpg`);
-    }
-
-    // Zufällige Mischung
-    const shuffledImages = [...images].sort(() => Math.random() - 0.5);
-
     const galleryContainer = document.getElementById('gallery');
-    shuffledImages.forEach((src, index) => {
+    
+    // 1. Array mit Zahlen 1 bis 51 erstellen und mischen
+    let numbers = Array.from({length: imageCount}, (_, i) => i + 1);
+    numbers.sort(() => Math.random() - 0.5);
+
+    // Hier speichern wir die funktionierenden Links für die Lightbox
+    let shuffledImages = new Array(imageCount);
+
+    numbers.forEach((num, index) => {
         const div = document.createElement('div');
         div.className = 'img-wrapper';
         const img = document.createElement('img');
-        img.src = src;
         img.loading = "lazy";
-        // Fehlermeldung in der Browser-Konsole, falls ein Pfad nicht stimmt
-        img.onerror = () => console.log("Fehler bei: " + src);
-        img.onclick = (e) => openLightbox(index, e);
+        
+        // MAGISCHER FALLBACK: Löst die häufigsten GitHub-Probleme
+        const extensions = ['jpg', 'JPG', 'jpeg', 'JPEG'];
+        let tryIndex = 0;
+
+        const tryLoadImage = () => {
+            if (tryIndex < extensions.length) {
+                img.src = `bilder/${num}.${extensions[tryIndex]}`;
+                tryIndex++;
+            } else {
+                // Wenn kein Bild gefunden wird, verstecke das leere Quadrat
+                div.style.display = 'none';
+            }
+        };
+
+        // Wenn Fehler (z.B. 404), probiere die nächste Endung
+        img.onerror = tryLoadImage; 
+        
+        // Wenn das Bild erfolgreich lädt, in die Lightbox-Liste aufnehmen
+        img.onload = () => {
+            shuffledImages[index] = img.src;
+            img.onclick = (e) => openLightbox(index, e);
+        };
+
+        // Ersten Versuch starten
+        tryLoadImage();
+
         div.appendChild(img);
         galleryContainer.appendChild(div);
     });
 
+    // --- Lightbox Logik ---
     let currentIndex = 0;
     const lb = document.getElementById('lightbox');
     const lbImg = document.getElementById('lightbox-img');
@@ -192,6 +218,10 @@
     function updateLightboxImage() {
         lbImg.style.opacity = 0;
         setTimeout(() => {
+            // Überspringe leere Plätze (falls ein Bild ganz fehlt)
+            while(!shuffledImages[currentIndex]) {
+                currentIndex = (currentIndex + 1) % imageCount;
+            }
             lbImg.src = shuffledImages[currentIndex];
             lbImg.style.opacity = 1;
         }, 150);
@@ -199,7 +229,7 @@
 
     lbImg.onclick = (event) => {
         event.stopPropagation();
-        currentIndex = (currentIndex + 1) % shuffledImages.length;
+        currentIndex = (currentIndex + 1) % imageCount;
         updateLightboxImage();
     };
 
