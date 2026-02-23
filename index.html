@@ -3,99 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REAL | Showreel</title>
+    <title>REAL</title>
     <style>
         body { margin: 0; background: #fff; color: #000; font-family: 'Arial Black', sans-serif; display: flex; flex-direction: column; align-items: center; }
+        header { padding: 60px 0; width: 100%; max-width: 800px; text-align: center; }
+        .title-box { display: inline-block; width: 100%; }
+        h1 { font-size: clamp(80px, 20vw, 250px); margin: 0; line-height: 0.8; letter-spacing: -0.05em; text-align: center; }
         
-        /* Blocksatz Header: Schmiegt sich an REAL an */
-        header { padding: 80px 20px 40px; display: flex; justify-content: center; width: 100%; box-sizing: border-box; }
-        .title-wrapper { display: flex; flex-direction: column; width: fit-content; }
-        
-        h1 { 
-            font-size: clamp(80px, 20vw, 250px); 
-            margin: 0; 
-            line-height: 0.8; 
-            letter-spacing: -0.05em; 
-            text-transform: uppercase;
-        }
-        
+        /* Unterzeile: Grau 70% und zentriert */
         .sub { 
             display: flex; 
-            justify-content: space-between; 
-            font-family: Arial, sans-serif; 
-            font-weight: 900; 
-            font-size: clamp(10px, 1.6vw, 22px); 
-            margin-top: 5px; 
-            width: 100%;
-        }
-
-        /* Galerie-Gitter */
-        .gallery { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
+            justify-content: center; 
             gap: 15px; 
-            max-width: 900px; 
-            width: 90%; 
-            padding-bottom: 100px; 
+            font-family: Arial; 
+            font-weight: bold; 
+            font-size: clamp(10px, 1.5vw, 19px); 
+            margin-top: 15px; 
+            color: rgba(0, 0, 0, 0.7); 
         }
-        
-        @media (max-width: 600px) { .gallery { grid-template-columns: repeat(2, 1fr); } }
 
-        .item { aspect-ratio: 1/1; background: #f0f0f0; cursor: pointer; overflow: hidden; }
-        .item img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: 0.4s; }
-        .item:hover img { filter: grayscale(0%); transform: scale(1.03); }
-
-        /* Lightbox */
-        #lb { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 1000; cursor: pointer; }
-        #lb img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 800px; width: 95%; padding-bottom: 50px; }
+        .item { aspect-ratio: 1/1; background: #eee; cursor: pointer; overflow: hidden; }
+        .item img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: 0.3s; }
+        .item:hover img { filter: grayscale(0%); }
+        #lb { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 100; }
+        #lb img { max-width: 90%; max-height: 90%; }
     </style>
 </head>
 <body>
-
-<header>
-    <div class="title-wrapper">
-        <h1>REAL</h1>
-        <div class="sub">
-            <span>SHOWREEL</span><span>VON</span><span>DIETMAR</span><span>ZECHNER</span>
+    <header>
+        <div class="title-box">
+            <h1>REAL</h1>
+            <div class="sub">
+                <span>SHOWREEL</span>
+                <span>VON</span>
+                <span>DIETMAR</span>
+                <span>ZECHNER</span>
+            </div>
         </div>
-    </div>
-</header>
+    </header>
+    <div class="gallery" id="g"></div>
+    <div id="lb" onclick="this.style.display='none'"><img id="im"></div>
 
-<div class="gallery" id="g"></div>
-
-<div id="lb" onclick="this.style.display='none'"><img id="im"></div>
-
-<script>
-    const g = document.getElementById('g');
-    const lb = document.getElementById('lb'), im = document.getElementById('im');
-    
-    // Generiert Pfade für 51 Bilder
-    let images = Array.from({length: 51}, (_, i) => `bilder/${i + 1}.jpg`);
-    
-    // Mischen
-    images.sort(() => Math.random() - 0.5);
-
-    images.forEach(src => {
-        const div = document.createElement('div');
-        div.className = 'item';
-        const img = document.createElement('img');
-        img.src = src;
-        img.loading = "lazy";
+    <script>
+        const g = document.getElementById('g');
+        const lb = document.getElementById('lb'), im = document.getElementById('im');
         
-        // Automatischer Check: Falls .jpg nicht geht, probiere .JPG
-        img.onerror = () => { 
-            if (img.src.includes('.jpg')) {
-                img.src = src.replace('.jpg', '.JPG'); 
-            } else {
-                div.style.display = 'none'; // Verstecke das Feld, wenn Bild gar nicht existiert
-            }
-        };
+        // Basierend auf deinem Screenshot: Bilder 1 bis 51 im Ordner "bilder"
+        let files = Array.from({length: 51}, (_, i) => `bilder/${i + 1}.jpg`);
         
-        img.onclick = () => { im.src = img.src; lb.style.display = 'flex'; };
-        div.appendChild(img);
-        g.appendChild(div);
-    });
-</script>
+        // Zufällige Sortierung beim Laden
+        files.sort(() => Math.random() - 0.5);
 
+        files.forEach(f => {
+            const d = document.createElement('div');
+            d.className = 'item';
+            const i = document.createElement('img');
+            i.src = f;
+            
+            // Falls GitHub Pages Groß-/Kleinschreibung strikt trennt (.JPG statt .jpg)
+            i.onerror = () => { 
+                if(i.src.includes('.jpg')) i.src = i.src.replace('.jpg', '.JPG'); 
+            };
+            
+            i.onclick = () => { 
+                im.src = i.src; 
+                lb.style.display = 'flex'; 
+            };
+            d.appendChild(i);
+            g.appendChild(d);
+        });
+    </script>
 </body>
 </html>
