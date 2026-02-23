@@ -6,19 +6,21 @@
     <title>REAL</title>
     <style>
         body { margin: 0; background: #fff; color: #000; font-family: 'Arial Black', sans-serif; display: flex; flex-direction: column; align-items: center; }
-        header { padding: 60px 0; width: 100%; max-width: 800px; text-align: center; }
+        header { padding: 40px 0; width: 100%; max-width: 800px; text-align: center; }
         .title-box { display: inline-block; width: 100%; }
-        h1 { font-size: clamp(80px, 20vw, 250px); margin: 0; line-height: 0.8; letter-spacing: -0.05em; text-align: center; }
+        
+        /* REAL Schriftzug: Halbiert auf max 125px */
+        h1 { font-size: clamp(40px, 10vw, 125px); margin: 0; line-height: 0.8; letter-spacing: -0.05em; text-align: center; }
         
         /* Unterzeile: Grau 70% und zentriert */
         .sub { 
             display: flex; 
             justify-content: center; 
-            gap: 15px; 
+            gap: 12px; 
             font-family: Arial; 
             font-weight: bold; 
-            font-size: clamp(10px, 1.5vw, 19px); 
-            margin-top: 15px; 
+            font-size: clamp(8px, 1.2vw, 14px); 
+            margin-top: 10px; 
             color: rgba(0, 0, 0, 0.7); 
         }
 
@@ -49,10 +51,10 @@
         const g = document.getElementById('g');
         const lb = document.getElementById('lb'), im = document.getElementById('im');
         
-        // Basierend auf deinem Screenshot: Bilder 1 bis 51 im Ordner "bilder"
+        // Greift auf den Ordner "bilder" aus deinem Screenshot zu
         let files = Array.from({length: 51}, (_, i) => `bilder/${i + 1}.jpg`);
         
-        // Zufällige Sortierung beim Laden
+        // Zufällige Sortierung
         files.sort(() => Math.random() - 0.5);
 
         files.forEach(f => {
@@ -61,7 +63,7 @@
             const i = document.createElement('img');
             i.src = f;
             
-            // Falls GitHub Pages Groß-/Kleinschreibung strikt trennt (.JPG statt .jpg)
+            // Fehlerbehandlung für .jpg vs .JPG auf GitHub
             i.onerror = () => { 
                 if(i.src.includes('.jpg')) i.src = i.src.replace('.jpg', '.JPG'); 
             };
