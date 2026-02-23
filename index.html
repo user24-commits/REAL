@@ -7,25 +7,14 @@
     <style>
         body { margin: 0; background: #fff; color: #000; font-family: 'Arial Black', sans-serif; display: flex; flex-direction: column; align-items: center; }
         header { padding: 40px 0; width: 100%; max-width: 800px; text-align: center; }
-        .title-box { display: inline-block; width: 100%; }
-        
-        /* REAL Schriftzug: Halbiert auf max 125px */
-        h1 { font-size: clamp(40px, 10vw, 125px); margin: 0; line-height: 0.8; letter-spacing: -0.05em; text-align: center; }
-        
-        /* Unterzeile: Grau 70% und zentriert */
+        h1 { font-size: clamp(40px, 10vw, 125px); margin: 0; line-height: 0.8; letter-spacing: -0.05em; }
         .sub { 
-            display: flex; 
-            justify-content: center; 
-            gap: 12px; 
-            font-family: Arial; 
-            font-weight: bold; 
-            font-size: clamp(8px, 1.2vw, 14px); 
-            margin-top: 10px; 
-            color: rgba(0, 0, 0, 0.7); 
+            display: flex; justify-content: center; gap: 12px; 
+            font-family: Arial; font-weight: bold; font-size: clamp(8px, 1.2vw, 14px); 
+            margin-top: 10px; color: rgba(0, 0, 0, 0.7); 
         }
-
         .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 800px; width: 95%; padding-bottom: 50px; }
-        .item { aspect-ratio: 1/1; background: #eee; cursor: pointer; overflow: hidden; }
+        .item { aspect-ratio: 1/1; background: #f0f0f0; cursor: pointer; overflow: hidden; }
         .item img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: 0.3s; }
         .item:hover img { filter: grayscale(0%); }
         #lb { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 100; }
@@ -34,44 +23,39 @@
 </head>
 <body>
     <header>
-        <div class="title-box">
-            <h1>REAL</h1>
-            <div class="sub">
-                <span>SHOWREEL</span>
-                <span>VON</span>
-                <span>DIETMAR</span>
-                <span>ZECHNER</span>
-            </div>
-        </div>
+        <h1>REAL</h1>
+        <div class="sub"><span>SHOWREEL</span><span>VON</span><span>DIETMAR</span><span>ZECHNER</span></div>
     </header>
     <div class="gallery" id="g"></div>
-    <div id="lb" onclick="this.style.display='none'"><img id="im"></div>
+    <div id="lb" onclick="this.style.display='none'"><img id="im" src=""></div>
 
     <script>
         const g = document.getElementById('g');
         const lb = document.getElementById('lb'), im = document.getElementById('im');
         
-        // Greift auf den Ordner "bilder" aus deinem Screenshot zu
-        let files = Array.from({length: 51}, (_, i) => `bilder/${i + 1}.jpg`);
+        // Erstellt Array von 1 bis 51
+        let files = Array.from({length: 51}, (_, i) => `${i + 1}.jpg`);
         
-        // Zufällige Sortierung
-        files.sort(() => Math.random() - 0.5);
-
         files.forEach(f => {
             const d = document.createElement('div');
             d.className = 'item';
             const i = document.createElement('img');
-            i.src = f;
             
-            // Fehlerbehandlung für .jpg vs .JPG auf GitHub
+            // Pfad zum Ordner "bilder"
+            i.src = `bilder/${f}`;
+            
+            // Fallback für .JPG (Großbuchstaben)
             i.onerror = () => { 
-                if(i.src.includes('.jpg')) i.src = i.src.replace('.jpg', '.JPG'); 
+                if(!i.dataset.tried) {
+                    i.dataset.tried = "true";
+                    i.src = i.src.replace('.jpg', '.JPG');
+                } else {
+                    console.error("Bild nicht gefunden:", f);
+                    d.style.display = 'none'; // Versteckt leere Boxen
+                }
             };
             
-            i.onclick = () => { 
-                im.src = i.src; 
-                lb.style.display = 'flex'; 
-            };
+            i.onclick = () => { im.src = i.src; lb.style.display = 'flex'; };
             d.appendChild(i);
             g.appendChild(d);
         });
