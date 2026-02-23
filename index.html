@@ -5,146 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>REAL | Dietmar Zechner</title>
     <style>
-        /* NEU: Farbschema auf Weiß/Schwarz gedreht */
         :root {
             --bg-color: #ffffff;
             --text-color: #000000;
-            --accent-color: #333333; /* Etwas dunkleres Grau für Akzente */
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            /* Bevorzugt schwere, plakative Schriften */
-            font-family: 'Arial Black', 'Helvetica Neue', Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            font-family: 'Arial Black', Gadget, sans-serif;
+            overflow-x: hidden;
         }
 
-        /* Header Bereich */
+        /* --- HEADER: REAL & Subtext bündig --- */
         header {
-            text-align: center;
-            padding: 80px 20px 60px;
-            text-transform: uppercase;
-            /* Container, damit Titel und Untertitel die gleiche Breite haben */
+            width: 100%;
+            max-width: 800px; /* Gleiche Breite wie die Galerie */
+            padding: 80px 20px 40px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: fit-content;
-            margin: 0 auto;
         }
 
-        h1.plakativ {
-            /* NEU: Extrem fett und groß */
-            font-size: clamp(70px, 18vw, 200px);
+        h1 {
+            font-size: clamp(80px, 22vw, 240px);
+            line-height: 0.75;
             margin: 0;
-            line-height: 0.85;
+            text-align: center;
+            width: 100%;
+            letter-spacing: -0.05em; /* Macht es noch plakativer */
+            text-transform: uppercase;
             font-weight: 900;
-            letter-spacing: -2px; /* Buchstaben enger zusammen für Block-Look */
-            color: var(--text-color);
         }
 
-        /* NEU: Der Blocksatz-Trick für den Untertitel */
         .subtitle-block {
-            width: 100%; /* Nimmt die Breite von H1 an */
             display: flex;
-            justify-content: space-between; /* Verteilt die Wörter bündig */
-            margin-top: 15px;
-        }
-
-        .subtitle-block span {
-            font-size: clamp(12px, 1.5vw, 18px);
+            justify-content: space-between; /* Erzwingt den Blocksatz */
+            width: 100%;
+            margin-top: 10px;
+            font-family: Arial, sans-serif;
             font-weight: bold;
-            letter-spacing: 1px;
-            color: var(--accent-color);
-            font-family: 'Helvetica Neue', Arial, sans-serif; /* Etwas ruhigere Schrift für Subtext */
+            font-size: clamp(10px, 1.8vw, 20px);
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
         }
 
-        /* Galerie-Grid */
+        /* --- GALERIE: 3 Spalten Desktop, 2 Handy --- */
         .gallery {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px; /* Abstände etwas verringert für kompakteren Look */
-            /* NEU: Schmäler gemacht */
-            max-width: 800px; 
+            gap: 12px;
+            max-width: 800px;
             width: 92%;
             padding-bottom: 100px;
         }
 
-        @media (max-width: 768px) {
-            .gallery { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        @media (max-width: 480px) {
-            .gallery { grid-template-columns: 1fr; }
-             /* Auf ganz kleinen Handys den Untertitel nicht mehr bündig zwingen, sieht sonst komisch aus */
-            .subtitle-block {
-                justify-content: center;
-                gap: 5px;
+        @media (max-width: 600px) {
+            .gallery { 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 8px;
             }
+            header { padding-top: 50px; }
         }
 
         .img-wrapper {
             aspect-ratio: 1 / 1;
             overflow: hidden;
-            background: #f0f0f0; /* Heller Platzhalter */
+            background: #f9f9f9;
             cursor: pointer;
-            /* NEU: Subtiler Schatten, damit sich weiße Bilder vom weißen Grund abheben */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
         }
 
         .img-wrapper img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Immer Schwarz-Weiß für den edlen Look */
-            filter: grayscale(100%) contrast(110%); 
+            filter: grayscale(100%);
             transition: transform 0.5s ease, filter 0.5s ease;
         }
 
-        /* Beim Hover nur leichter Zoom, bleibt S/W */
         .img-wrapper:hover img {
-            transform: scale(1.03);
+            transform: scale(1.05);
+            filter: grayscale(0%); /* Optional: Farbe beim Hover */
         }
 
-        /* Lightbox Style (Bleibt dunkel für Kontrast) */
+        /* --- LIGHTBOX (Endlos-Loop) --- */
         #lightbox {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.95); /* Weißer, fast deckender Hintergrund */
+            background: rgba(0, 0, 0, 0.95);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             cursor: pointer;
         }
-        
-        /* Für die Lightbox drehen wir die Farben wieder um für maximalen Fokus */
-        #lightbox.dark-mode {
-             background: rgba(0,0,0,0.92);
-        }
 
         #lightbox img {
             max-width: 90%;
-            max-height: 85vh; /* Verhindert, dass hohe Bilder aus dem Screen ragen */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            /* Auch in der Lightbox strikt S/W */
+            max-height: 90%;
+            object-fit: contain;
             filter: grayscale(100%);
+            transition: opacity 0.3s ease;
+        }
+
+        /* Schließen-Button oben rechts */
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-family: Arial;
+            line-height: 1;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1 class="plakativ">REAL</h1>
+    <h1>REAL</h1>
     <div class="subtitle-block">
-        <span>SHOWREEL</span> 
-        <span>VON</span> 
-        <span>DIETMAR</span> 
+        <span>SHOWREEL</span>
+        <span>VON</span>
+        <span>DIETMAR</span>
         <span>ZECHNER</span>
     </div>
 </header>
@@ -152,85 +142,66 @@
 <div class="gallery" id="gallery">
     </div>
 
-<div id="lightbox" class="dark-mode" onclick="closeLightbox()">
-    <img id="lightbox-img" src="" alt="Fullsize Foto">
+<div id="lightbox" onclick="closeLightbox()">
+    <span class="close-btn">&times;</span>
+    <img id="lightbox-img" src="" alt="Fullsize">
 </div>
 
 <script>
-    // ----- KONFIGURATION -----
-    const imageCount = 63; // Anzahl deiner Bilder
-    const imagePath = 'bilder/'; // Pfad zum Ordner
-    // -------------------------
-
-    let images = [];
+    // Konfiguration: 51 Bilder benannt 1.jpg bis 51.jpg im Ordner "bilder"
+    const imageCount = 51;
+    const images = [];
     for(let i = 1; i <= imageCount; i++) {
-        images.push(`${imagePath}${i}.jpg`); 
+        images.push(`bilder/${i}.jpg`);
     }
 
-    // Shuffle Funktion
-    function shuffle(array) {
-        let currentIndex = array.length, randomIndex;
-        while (currentIndex != 0) {
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-            [array[currentIndex], array[randomIndex]] = [
-                array[randomIndex], array[currentIndex]];
-        }
-        return array;
-    }
+    // Shuffle beim jedem Laden
+    const shuffledImages = [...images].sort(() => Math.random() - 0.5);
 
     const galleryContainer = document.getElementById('gallery');
-    // WICHTIG: Kopie erstellen ([...images]) bevor geshuffled wird
-    let shuffledImages = shuffle([...images]);
-
-    // Galerie rendern
     shuffledImages.forEach((src, index) => {
         const div = document.createElement('div');
         div.className = 'img-wrapper';
-        // Wichtig: Event listener direkt hier anhängen für bessere Kontrolle
-        const img = document.createElement('img');
-        img.src = src;
-        img.loading = "lazy";
-        img.onclick = (e) => openLightbox(index, e);
-        div.appendChild(img);
+        div.innerHTML = `<img src="${src}" loading="lazy" onclick="openLightbox(${index}, event)">`;
         galleryContainer.appendChild(div);
     });
 
     let currentIndex = 0;
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightbox-img');
 
     function openLightbox(index, event) {
         event.stopPropagation();
         currentIndex = index;
-        // Lade das Bild aus dem geshuffelten Array
-        lightboxImg.src = shuffledImages[currentIndex];
-        lightbox.style.display = 'flex';
-        // Verhindert Scrollen des Body, wenn Lightbox offen ist
-        document.body.style.overflow = 'hidden';
+        updateLightboxImage();
+        lb.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Scrollstopp
     }
 
     function closeLightbox() {
-        lightbox.style.display = 'none';
-         // Erlaubt Scrollen wieder
+        lb.style.display = 'none';
         document.body.style.overflow = 'auto';
     }
 
-    // Loop-Funktion beim Klicken auf das Bild
-    lightboxImg.addEventListener('click', (e) => {
-        e.stopPropagation(); // Verhindert, dass der Klick das Schließen-Event des Containers triggert
-        currentIndex = (currentIndex + 1) % shuffledImages.length;
-        // Kurzer Fade-Effekt beim Wechsel
-        lightboxImg.style.opacity = 0;
+    function updateLightboxImage() {
+        lbImg.style.opacity = 0;
         setTimeout(() => {
-             lightboxImg.src = shuffledImages[currentIndex];
-             lightboxImg.style.opacity = 1;
-        }, 150); // Sehr kurzer Moment zum Laden
-    });
+            lbImg.src = shuffledImages[currentIndex];
+            lbImg.style.opacity = 1;
+        }, 150);
+    }
 
-    // CSS für den Fade-Effekt hinzufügen
-    lightboxImg.style.transition = "opacity 0.3s ease";
+    // Klick auf das Bild in der Lightbox für das nächste Bild (Loop)
+    lbImg.onclick = (event) => {
+        event.stopPropagation();
+        currentIndex = (currentIndex + 1) % shuffledImages.length;
+        updateLightboxImage();
+    };
 
+    // Tastatur-Steuerung (ESC zum Schließen)
+    window.onkeydown = function(event) {
+        if (event.key === "Escape") closeLightbox();
+    };
 </script>
 
 </body>
